@@ -1,0 +1,75 @@
+:root {
+  --color-terracotta: #C85A32;
+  --color-terracotta-dark: #8E3414;
+  --color-sand: #EEDC9A;
+  --color-sand-light: #F7F0D4;
+  --color-wood-dark: #3E2723;
+  --color-wood-medium: #5D4037;
+  --color-wood-light: #8D6E63;
+  --color-palm: #2E7D32;
+  --color-palm-accent: #4CAF50;
+  --color-gold: #D4AF37;
+  --color-gold-bright: #FFD700;
+  --color-bg-dark: #1F1512;
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-tamil: 'Noto Sans Tamil', 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--color-bg-dark);
+  font-family: var(--font-main);
+  color: var(--color-sand-light);
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #2C1B14 0%, #120A07 100%);
+}
+
+#game-container {
+  width: 100%;
+  height: 100%;
+  max-width: 1280px;
+  max-height: 720px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(200, 90, 50, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#game-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
+
+.tamil-text {
+  font-family: var(--font-tamil);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-terracotta);
+  border-radius: 4px;
+}
