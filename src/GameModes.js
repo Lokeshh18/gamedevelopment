@@ -22,7 +22,8 @@ export class GameModeManager {
     this.isMultiplayer = isMultiplayer;
     this.activePlayerIndex = 0;
 
-    const initialAttempts = modeType === MODES.POT_SMASH ? 5 : 3;
+    // Both modes have exactly 3 attempts as requested by the user
+    const initialAttempts = 3;
 
     this.players = [
       {

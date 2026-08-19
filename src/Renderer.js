@@ -1,4 +1,4 @@
-// Renderer.js - High-Performance 2D Canvas Renderer for Tamil Heritage Village
+// Renderer.js - High-Performance 2D Canvas Renderer with Reference Image Elements
 
 export class Renderer {
   constructor(canvas) {
@@ -33,9 +33,13 @@ export class Renderer {
   }
 
   // Camera tracking follows Gilli during flight
-  updateCamera(gilliX) {
-    const desiredX = gilliX - this.width * 0.3;
-    this.targetCameraX = Math.max(0, desiredX);
+  updateCamera(gilliX, phase) {
+    if (phase === 'FLIGHT_AND_ROLL') {
+      const desiredX = gilliX - this.width * 0.3;
+      this.targetCameraX = Math.max(0, desiredX);
+    } else {
+      this.targetCameraX = 0;
+    }
     // Smooth camera interpolation
     this.cameraX += (this.targetCameraX - this.cameraX) * 0.08;
   }
@@ -471,18 +475,7 @@ export class Renderer {
       }
     });
 
-    // Render off-screen Uri target indicators if pots are ahead
-    const unsmashedPots = pots.filter(p => !p.smashed);
-    if (unsmashedPots.length > 0) {
-      const nextPot = unsmashedPots[0];
-      const screenPotX = nextPot.x - camX;
-      if (screenPotX > w - 40) {
-        // Draw HUD Arrow pointing right
-        ctx.fillStyle = '#ffd700';
-        ctx.font = '800 14px Outfit';
-        ctx.fillText(`🎯 Target Pot ahead ➡ (${((nextPot.x - physics.pitPos.x) / 30).toFixed(0)}m)`, w - 210, 110);
-      }
-    }
+
 
     // 7. Aim Trajectory Line during Flick Phase
     if (physics.phase === 'PIT_FLICK_AIM' && physics.aimStart && physics.aimCurrent) {
@@ -616,10 +609,10 @@ export class Renderer {
     ctx.strokeStyle = '#5c3016';
     ctx.lineWidth = 1.5;
     ctx.stroke();
+    ctx.restore(); // Restores Gilli local rotation/translation
+    ctx.restore(); // Restores main camera translate(-camX, 0)
 
-    ctx.restore();
-
-    // 10b. Render Environmental Wind Breeze Streaks across sky and field
+    // 10b. Render Environmental Wind Breeze Streaks across sky and field (Screen-Space)
     ctx.save();
     this.windStreaks.forEach(s => {
       const screenX = s.x - camX;
@@ -637,7 +630,9 @@ export class Renderer {
     });
     ctx.restore();
 
-    // 11. Render Particles (Impact sparks / pot shards)
+    // 11. Render Particles (Impact sparks / pot shards in screen-space using -camX translate)
+    ctx.save();
+    ctx.translate(-camX, 0);
     this.particles.forEach(p => {
       ctx.save();
       ctx.globalAlpha = Math.max(0, p.life);
@@ -653,7 +648,18 @@ export class Renderer {
       }
       ctx.restore();
     });
+    ctx.restore();
 
-    ctx.restore(); // Restore camera translation
+    // 12. Render off-screen Uri target indicators if pots are ahead (Screen-Space Overlay)
+    const unsmashedPots = pots.filter(p => !p.smashed);
+    if (unsmashedPots.length > 0) {
+      const nextPot = unsmashedPots[0];
+      const screenPotX = nextPot.x - camX;
+      if (screenPotX > w - 40) {
+        ctx.fillStyle = '#ffd700';
+        ctx.font = '800 14px Outfit';
+        ctx.fillText(`🎯 Target Pot ahead ➡ (${((nextPot.x - physics.pitPos.x) / 30).toFixed(0)}m)`, w - 210, 110);
+      }
+    }
   }
 }

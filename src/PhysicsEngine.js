@@ -159,18 +159,31 @@ export class PhysicsEngine {
       }
     }
 
-    if (this.phase === GAME_PHASES.AIRBORNE_TIMING || this.phase === GAME_PHASES.FLIGHT_AND_ROLL) {
-      // Apply gravity
-      this.gilli.vy += this.gravity * dt;
+    if (this.phase === GAME_PHASES.AIRBORNE_TIMING) {
+      // Graceful slow-motion timing window (Matrix-style hang time)
+      const timeScale = 0.35;
+      this.gilli.vy += this.gravity * 0.15 * dt; 
+      this.gilli.vx += (this.wind * 0.05) * dt;
 
-      // Apply wind force
+      this.gilli.x += this.gilli.vx * timeScale * dt;
+      this.gilli.y += this.gilli.vy * timeScale * dt;
+      this.gilli.angle += this.gilli.vAngle * timeScale * dt;
+
+      // Fallback: If Gilli falls back to the ground before hit
+      if (this.gilli.y >= this.groundY - 5) {
+        this.gilli.y = this.groundY - 5;
+        this.gilli.vx = 0;
+        this.gilli.vy = 0;
+        this.gilli.vAngle = 0;
+        this.phase = GAME_PHASES.LANDED;
+      }
+    } else if (this.phase === GAME_PHASES.FLIGHT_AND_ROLL) {
+      // Full speed flight simulation
+      this.gilli.vy += this.gravity * dt;
       this.gilli.vx += (this.wind * 0.2) * dt;
 
-      // Update positions
       this.gilli.x += this.gilli.vx * dt;
       this.gilli.y += this.gilli.vy * dt;
-
-      // Rotation spin
       this.gilli.angle += this.gilli.vAngle * dt;
 
       // Track max altitude

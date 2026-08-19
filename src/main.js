@@ -63,7 +63,7 @@ class GameController {
   initEvents() {
     window.addEventListener('resize', () => this.resizeCanvas());
 
-    // Exit & Return to Main Menu Buttons (all home / exit buttons across HUD & modals)
+    // Exit & Return to Main Menu Buttons
     const handleExit = (e) => {
       if (e) {
         e.stopPropagation();
@@ -87,6 +87,7 @@ class GameController {
       this.renderShop();
       this.showModal('shop');
     };
+
     document.getElementById('sound-toggle-btn').onclick = (e) => {
       const isMuted = this.sound.toggleMute();
       e.target.textContent = isMuted ? '🔇' : '🔊';
@@ -254,6 +255,7 @@ class GameController {
     const headerTitle = document.getElementById('app-header-title');
     if (headerTitle) headerTitle.textContent = 'Gilli Danda';
 
+    this.views.menu.classList.remove('hidden');
     this.views.menu.classList.add('active');
     this.views.hud.classList.add('hidden');
     this.views.hud.classList.remove('active');
@@ -262,6 +264,7 @@ class GameController {
   }
 
   startMatch(modeType, p1Name, p2Name, isMultiplayer) {
+    this.views.menu.classList.add('hidden');
     this.views.menu.classList.remove('active');
     this.views.hud.classList.remove('hidden');
     this.views.hud.classList.add('active');
@@ -341,7 +344,7 @@ class GameController {
 
     // Update Camera position to follow Gilli
     if (this.views.hud.classList.contains('active')) {
-      this.renderer.updateCamera(this.physics.gilli.x);
+      this.renderer.updateCamera(this.physics.gilli.x, this.physics.phase);
       this.updateHUD();
 
       // Check Pot collision in Pot Smash mode during flight or airborne motion
@@ -548,4 +551,3 @@ class GameController {
 window.addEventListener('DOMContentLoaded', () => {
   new GameController();
 });
-
